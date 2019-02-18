@@ -1,0 +1,1327 @@
+一、底部导航栏
+    1.创建入口文件 使用主题样式 新建导航文件 在main.dart中引入 在home处引入文件中的自定义导航组件
+        import 'package:flutter/material.dart';
+        import 'botton_navition_widget.dart'; //引入导航文件
+        void main()=>runApp(MyApp());
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                title: '底部导航栏',
+                theme: ThemeData.light(), //使用flutter自带的主题
+                home: BottonNavigationWidget() //自定义导航组件
+                );
+            }
+        }
+    2.在导航文件中定义导航组件  继承动态Widget
+        StatefulWidget具有可变状态(state)的窗口组件（widget）。使用这个要根据变化状态，调整State值。
+        使用stful命令快速构建一个结构 返回scaffold脚手架 
+        脚手架中已经有了导航栏的位置 就像appBar一样 配置导航栏即可
+        导航栏属性：bottomNavigationBar，组件 BottomNavigationBar()
+        BottomNavigationBar()组件中子属性items 是导航栏的子项 不可以小于2个子项 所以items是数组类型
+        在items[]中使用导航栏子组件BottomNavigationBarItem()配置导航栏每一项
+        BottomNavigationBarItem()中有两个属性 Icon和title
+        创建内部变量保存字体和图标的颜色 以后复用
+
+         class BottonNavigationWidget extends StatefulWidget { //动态widget
+            _BottonNavigationWidgetState createState() => _BottonNavigationWidgetState();
+        }
+        //动态widget
+        class _BottonNavigationWidgetState extends State<BottonNavigationWidget> {
+            创建内部变量保存字体和图标的颜色 以后复用
+            final _BottonNavigationColor=Colors.greenAccent;
+            @override
+            Widget build(BuildContext context) {
+                return Scaffold(
+                    bottomNavigationBar: BottomNavigationBar( //导航栏组件
+                        items: [
+                            BottomNavigationBarItem(  //导航栏的子部件
+                                icon: Icon(Icons.home,color:  _BottonNavigationColor,),
+                                title: Text('home',style: TextStyle(color:  _BottonNavigationColor),)
+                            ),
+                            BottomNavigationBarItem(
+                                icon: Icon(Icons.email,color:  _BottonNavigationColor,),
+                                title: Text('email',style: TextStyle(color:  _BottonNavigationColor),)
+                            ),
+                        ],
+                    ),
+                );
+            }
+        }
+    3.创建导航对应的4个页面 在导航文件中引入 
+        在继承的state中创建变量 int _currentIndex=0 表示当前显示页面下标
+        创建<Widget>类型的List 准备接收引入的4个页面
+        重写 initState方法 使用建造者语法将页面组件装入list 调用父类初始化状态
+        将装有页面的list放到body处显示 body:list[_currentIndex]
+        在 BottomNavigationBar()组件的onTap事件中动态改变页面下标 显示对应的页面
+         onTap: (int index){
+            setState(() {
+                _currentIndex=index; 
+            });
+        },
+        让BottomNavigationBar()组件的currentIndex属性对应_currentIndex 激活当前显示页面的图标样式 currentIndex: _currentIndex,
+
+        示例：
+            import 'pages/home_pages.dart';
+            class BottonNavigationWidget extends StatefulWidget {
+                _BottonNavigationWidgetState createState() => _BottonNavigationWidgetState();
+            }
+            class _BottonNavigationWidgetState extends State<BottonNavigationWidget> {
+                final _daohang=Colors.blue;
+
+                int _currentIndex=0; //表示当前显示页面的下标
+                List<Widget> list=List(); //准备接收引入的页面
+
+                @override
+                void initState() {
+                    建造者语法  返回调用者本身
+                    list
+                        ..add(HomePage())
+                        ..add(EmailPage())
+                        ..add(Airplay())
+                        ..add(PhonePage());
+                    super.initState(); //调用父类 初始化状态
+                    
+                }
+
+                @override
+                Widget build(BuildContext context) {
+                    return Scaffold(
+                        body: list[_currentIndex], //显示的页面
+                        bottomNavigationBar: BottomNavigationBar(
+                            items: [
+                                BottomNavigationBarItem(
+                                    icon: Icon(Icons.home,color:  _daohang,),
+                                    title: Text('home',style: TextStyle(color:  _daohang),)
+                                ),
+                                ...
+                            ],
+                            currentIndex: _currentIndex,
+                            onTap: (int index){
+                                setState(() {
+                                    _currentIndex=index; 
+                                });
+                            },
+                        ),
+                    );
+                }
+            }
+二、不规则的底部导航栏制作
+        1.新建appbar文件 在main.dart引入
+            创建入口方法 return MaterialApp()
+            自定义当前的theme主题皮肤
+            在home处写自定义appbar组件
+            return MaterialApp(
+                title: '不规则的底部导航栏',
+                //自定义主题样本
+                theme: ThemeData(
+                    primarySwatch: Colors.red
+                ),
+                home: BottomAppBarDemo(),//自定义组件
+            );
+        2.在appbar创建导航组件 继承动态Widget
+            return Scaffold脚手架 
+            脚手架有一个floatingActionButton的位置 可交互的浮动按钮
+            使用FloatingActionButton组件配置按钮信息
+            onPressed点击事件  tooltip长按提示的信息 child 按钮上的物件  一般是图标
+                return Scaffold(
+                    appBar: AppBar(
+                        title: Text('我的秘密'),
+                    ),
+                    //可交互的浮动按钮
+                    floatingActionButton:FloatingActionButton(
+                        onPressed: (){},
+                        //长按提示消息
+                        tooltip: '我们之间',
+                        child: Icon(Icons.add,color:Colors.white),
+                    ) ,
+                );
+        3.接着往下创建底部导航栏 让按钮与导航融合在一起 形成不规则的导航
+            这次使用bottomNavigationBar的BottomAppBar底部工具栏组件 这个要比BottomNavigationBar widget灵活很多，可以放置文字和图标，当然也可以放置容器。
+            BottomAppBar的常用属性:
+                color:这个不用多说，底部工具栏的颜色。
+                shape：设置底栏的形状，一般使用这个都是为了和floatingActionButton融合，所以使用的值都是CircularNotchedRectangle(),有缺口的圆形矩形。
+                child ： 里边可以放置大部分Widget，让我们随心所欲的设计底栏。
+            我们在child中放一个Row()行布局 
+            mainAxisAlignment: MainAxisAlignment.spaceAround, 对齐方式
+            mainAxisSize: MainAxisSize.max, 主轴最大尺寸
+            Row组件的children放两个按钮
+            写完这些代码已经有了一个悬浮的按钮和导航栏，但这个悬浮按钮还没有和低栏进行融合，这时候需要一个属性。
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, 
+            底部导航栏和按钮融合
+        5.同上个例子  在导航文件中声明Widget类型List 接受页面 声明_index表示要显示的页面下标
+            初始化state
+            initState中初始化list 将页面组件装入list 装入的同时传入要显示的值 想要显示几个页面就装几次
+        6.在浮动按钮的事件中通过Navigator.of().push创建新页面并跳转
+        7.在其他导航按钮的onPressed中更改_index的值 显示要显示的页面 最后在body中放入list[_index]显示页面
+            示例：包含上面按钮的代码
+                class _BottomAppBarDemoState extends State<BottomAppBarDemo> {
+                    List<Widget> _eachview;
+                    int _index=0;
+                    @override
+                    void initState() {
+                    _eachview =List();
+                    _eachview
+                        想要有几个页面就add几次并传入想要的值
+                        ..add(EachView('home'))
+                        ..add(EachView('eamill'));
+                        super.initState();
+                    }
+                上面是步骤5
+                return Scaffold(
+                    body:_eachview[_index] 步骤7.将装有页面组件的list放入body 并通过_index控制显示
+                    appBar: AppBar(
+                        title: Text('我的秘密'),
+                    ),
+                    //可交互的浮动按钮
+                    floatingActionButton:FloatingActionButton(
+                        onPressed: (){
+                            这是步骤6,使用导航组件返回新页面并跳转
+                            Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context){
+                                return EachView('new page');
+                            }
+                            ));
+                        },
+                        //长按提示消息
+                        tooltip: '我们之间',
+                        child: Icon(Icons.add,color:Colors.white),
+                    ) ,
+                    floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+                    bottomNavigationBar: BottomAppBar(
+                        color: Colors.redAccent,
+                        //为以后按钮的融合提供的缺口
+                        shape: CircularNotchedRectangle(),
+                        child: Row(         
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                                IconButton(
+                                    icon: Icon(Icons.home),
+                                    color: Colors.white,
+                                    onPressed: (){
+                                        步骤7.动态改变_index显示内容
+                                        setState(() {
+                                            _index=0; 
+                                        });
+                                    },
+                                ),
+                                    IconButton(
+                                    icon:Icon(Icons.email),
+                                    color:Colors.white,
+                                    onPressed: (){
+                                        setState(() {
+                                            步骤7.动态改变_index显示内容
+                                            _index=1; 
+                                        });
+                                    },
+                                )
+                            ],
+                        ),
+                    ),
+                );
+            }
+        4.为不规则导航添加交互效果
+            上一个实例中我们使用了子页面，但子页面继承与StatelessWidget(不可变控件)，所以很麻烦的写了4个页面，
+            其实完全可以写一个继承于StatefulWidget的控件，进行搞定。
+            动态的获取内容 显示要显示的内容
+            创建动态页面文件 eachview.dart 继承动态Widget
+            在继承的statefulWidget中声明变量 接受动态传过来的值 因为重写了这个组件 加一个@override
+            返回scaffold脚手架 做一个基本配置  使用接受过来的值
+            class EachView extends StatefulWidget {
+                String _title;
+                EachView(this._title);
+                @override
+                _EachViewState createState() => _EachViewState();
+            }
+            
+                return Scaffold(
+                    使用接受过来的值
+                    appBar: AppBar(title: Text(widget._title),),
+                    body: Center(
+                        child: Text(widget._title),
+                    ),
+                );
+三、页面切换的动画效果
+        首先回忆一下之前的路由切换
+            1.建入口文件 新建页面文件 main.dart中引入 home处挂载
+                import 'package:flutter/material.dart';
+                import 'pages.dart';
+                void main()=>runApp(MyApp());
+                class MyApp extends StatelessWidget {
+                    @override
+                    Widget build(BuildContext context) {
+                        return MaterialApp(
+                        title: '页面切换特效',
+                        theme: ThemeData(
+                            primarySwatch: Colors.blue
+                        ),
+                        home: FirstPage(),
+                        );
+                    }
+                }
+            2.pages文件中
+                创建页面组件 返回脚手架  设置页面的背景颜色 backgroundColor
+                配置页面的appBar appBar有一个elevation: 4.0, 表示appbar与页面的融合度 默认4.0，0.0表示完全融合
+                在body处放一个MaterialButton()按钮  按钮的事件使用路由组件返回第二个页面 实现跳转
+                    return Scaffold(
+                        backgroundColor: Colors.blue,
+                        appBar: AppBar(
+                            title: Text('first page',style: TextStyle(fontSize: 36.0),),
+                            elevation: 4.0,
+                        ),
+                        body: Center(
+                            child: MaterialButton(
+                                child: Icon(
+                                    Icons.navigate_next,
+                                    color: Colors.white,
+                                    size: 64.0,
+                                ),
+                                onPressed: (){
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (BuildContext context){
+                                            return SecondPage();
+                                        }
+                                    ));
+                                },
+                            ),
+                        ),
+                    );
+            3.接着往下创建第二个页面 跟第一个差不多 改一下背景颜色 区别一下第一页 
+                同样在按钮组件事件中Navigator.of(context).pop();返回上一页
+        其次开始新建页面配置带特效的路由
+            4.新建一个custome.dart文件，这个就是要自定义的路由方法，
+                自定义首先要继承于通用的路由的构造器类PageRouterBuilder。继承之后重写父类的CustomRoute构造方法。
+                创建widget变量 调用构造方法传入widget super调用父类 在super中配置路由动画
+                    transitionDuration：Duration(second:1) 动画事件
+                使用页面构造器pageBuilder 返回widget 构造器是匿名函数 有三个参数 将配置好的widget return出去
+                接下来使用transitionsBuilder配置动画状态 是匿名函数 有四个参数 包含上面构造器的三个参数 第四个参数 接受上面返回的widget
+                最后 return动画组件 FadeTransition()
+                FadeTransition是渐隐渐现 所以要配置他的opacity属性 使用 Tween(begin：0.0，end:1.0)
+                Tween中begin是开始 end是结束
+                Tween后接.animate配置动画曲线 
+                animate()中使用CurvedAnimation()组件配置动画曲线
+                    parent属性 就是要配置的动画对象 也是transitionsBuilder中的参数
+                    curve属性 动画播放状态 Curves.fastOutSlowIn 快进慢出
+                FadeTransition第二个属性child 如果有多个动画 child处接着写动画 
+                若没有动画后 将参数中接受的child返回
+                缩放动画ScaleTransition() 配置基本同FadeTransition 只是把opcity换为scale
+                旋转+缩放RotationTransition() 配置基本同上 属性换为turns 因为有多种动画 所以child就不能写child了
+                    将上面的缩放动画ScaleTransition()放到child的位置 如果还有动画 child继续写动画 没有就返回child
+                平移SlideTransition() 要使用Tween<Offset>配置它的position属性 也就是位移距离
+                    begin:Offset(-1.0,0.0) end:Offset(0.0,0.0) begin和end不再是0.0 而是一个Offser 坐标
+                    其他一样 
+                示例
+                    class Custome extends PageRouteBuilder{
+                        final Widget widget;
+                        Custome(this.widget)
+                        :super(
+                            transitionDuration:Duration(seconds: 1),
+                            pageBuilder:(BuildContext context,Animation<double> animation1,Animation<double> animation2){
+                                return widget;
+                            },
+                            transitionsBuilder:(BuildContext context,Animation<double> animation1,Animation<double> animation2,Widget child){
+                                /*
+                                渐隐渐现
+                                return FadeTransition(
+                                    opacity: Tween(begin: 0.0,end: 1.0).animate(CurvedAnimation(parent: animation1,curve: Curves.fastOutSlowIn)),
+                                    child: child,
+                                );
+                                缩放
+                                return ScaleTransition(
+                                    scale: Tween(begin: 0.0,end: 1.0).animate(CurvedAnimation(parent: animation1,curve: Curves.fastOutSlowIn)),
+                                    child: child,
+                                );
+                                旋转+缩放
+                                return RotationTransition(
+                                    turns: Tween(begin: 0.0,end: 1.0).animate(CurvedAnimation(parent: animation1,curve: Curves.fastOutSlowIn)),
+                                    child: ScaleTransition(
+                                        scale: Tween(begin: 0.0,end: 1.0).animate(CurvedAnimation(parent: animation1,curve: Curves.fastOutSlowIn)),
+                                        child: child,
+                                    ),
+                                );
+                                平移
+                                return SlideTransition(
+                                    position: Tween<Offset>(
+                                        begin: Offset(-1.0,0.0),
+                                        end: Offset(0.0, 0.0)
+                                        ).animate(CurvedAnimation(parent: animation1,curve: Curves.fastOutSlowIn)),
+                                    child: child,
+                                );
+                                */
+                            }
+                        );
+                    }
+四、磨砂毛玻璃效果
+    1.创建入口文件 新建滤镜文件 在main.dart中引入 body处挂载
+        import 'package:flutter/material.dart';
+        import 'mosha.dart';
+        void main()=>runApp(MyApp());
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                    title: '毛玻璃',
+                    theme: ThemeData(
+                        primarySwatch: Colors.lightBlue
+                    ),
+                    home: Scaffold(
+                        body: MoSha(),
+                    ),
+                );
+            }
+        }
+    2.在滤镜文件中 要想使用滤镜 需要引入dart:ui
+        毛玻璃效果其实是一层容器盖在图片上 所以使用stack层叠布局
+            stack需要多个组件层叠 属性children<widget>[]数组类型
+            第一个子元素 写一个ConstrainedBox()约束盒子 可以对子元素添加额外的约束条件
+                属性：constraints: const BoxConstraints.expand(), 使用BoxConstraints的expand表示可扩展的
+                    child:image.network(...) 第二个属性 放图片
+            第二个子元素 开始配置滤镜
+                首先放一个center居中 center包裹一个ClipRect()可裁切的矩形
+                ClipRect()中放一个BackdropFilter()背景过滤器
+                    BackdropFilter()的filter:ImageFilter.blur(sigmaX: 3.0,sigmaY: 3.0),配置模糊程度
+                    child属性放一个Opacity()配置矩形透明度
+                    Opacity()的opcity属性表示透明度
+                    child属性放一个盖在图片上的容器 Container
+                    设置Container的宽高 盒子修饰器修饰颜色深度 BoxDecoration(color: Colors.grey.shade200)
+                    Container的child放一个Center表示居中
+                    center的child放层叠在上面的文本 Text
+                    使用flutter准备的文字皮肤设置好看的字体style: Theme.of(context).textTheme.display3
+                示例：
+                    return Scaffold(
+                        body: Stack(
+                            children: <Widget>[
+                                ConstrainedBox(   //约束盒子组件 可以添加额外的约束条件
+                                    constraints: const BoxConstraints.expand(),
+                                    child: Image.network('https://img.zcool.cn/community/012afd5c62409ca801203d2233c4b6.jpg@1280w_1l_2o_100sh.jpg'),
+                                ),
+                                Center(
+                                    child: ClipRect(  //可裁切的矩形
+                                        child: BackdropFilter( //背景过滤器
+                                            filter: ImageFilter.blur(sigmaX: 3.0,sigmaY: 3.0),
+                                            child: Opacity(
+                                                opacity: 0.4,
+                                                child: Container(
+                                                    width: 500.0,
+                                                    height: 700.0,
+                                                    decoration: BoxDecoration(color: Colors.grey.shade200), //颜色深度
+                                                    child: Center(
+                                                        child: Text(
+                                                            'Believe_',
+                                                            style: Theme.of(context).textTheme.display3
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                )
+                            ],
+                        ),
+                    );
+五、保持页面状态和TabBar
+    1.首先创建入口文件 将tabbar单独封装 home处挂载
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                    title: 'tabbar',
+                    theme: ThemeData(
+                        primarySwatch: Colors.blue
+                    ),
+                    home: KeepAliveDemo(),
+                );
+            }
+        }
+    2.接着往下创建KeepAliveDemo组件 在 Tabs 里，使用到了动画效果，因此需要 with 一个类
+        with是dart的关键字，意思是混入的意思，就是说可以将一个或者多个类的功能添加到自己的类无需继承这些类，
+        SingleTickerProviderStateMixin 主要是我们初始化TabController时，
+        先声明变量 init初始化变量
+        需要用到vsync ， 动画效果的异步处理 垂直属性，然后传递this
+        然后重写dispose()销毁 当整个页面 dispose 时，记得把控制器controller也 dispose 掉，释放内存
+        在appbar的bottom属性配置 意思是 在appbar下方添加tabbar 
+        使用Tabbar组件  配置以下属性 
+        controller：属性配置控制器  将声明的controller变量放在这
+        tabs:<widget>[Tab(Icon:Icon(Icons.home))] tabbar的每一个图标
+        之后在body配置tabbar要切换的页面
+        使用TabBarView()组件 同样配置以下属性
+        controller：属性配置控制器  继续将声明的controller变量放在这
+        children:<widget>[组件...] 这里放tabbar对应的组件(页面)
+        示例：
+            class KeepAliveDemo extends StatefulWidget {
+                _KeepAliveDemoState createState() => _KeepAliveDemoState();
+            }
+
+            class _KeepAliveDemoState extends State<KeepAliveDemo> with SingleTickerProviderStateMixin {
+                TabController _controller;
+                @override
+                void initState() {
+                    super.initState();
+                    _controller=TabController(length: 3,vsync: this);
+                }
+
+                @override
+                void dispose() { 
+                    _controller.dispose();
+                    super.dispose();
+                }
+
+                @override
+                Widget build(BuildContext context) {
+                    return Scaffold(
+                        appBar: AppBar(
+                            title: Text('tabbar'),
+                            bottom: TabBar(
+                                controller: _controller,
+                                tabs: <Widget>[
+                                    Tab(icon: Icon(Icons.home),),
+                                    Tab(icon: Icon(Icons.email),),
+                                    Tab(icon: Icon(Icons.image),),
+                                ],
+                            ),
+                        ),
+                        body: TabBarView(
+                            controller: _controller,
+                            children: <Widget>[
+                                /*替换为下方的自定义组件
+                                Text('first page'),
+                                Text('second page'),
+                                Text('three page')
+                                */
+                                MyHomePage(),
+                                MyHomePage(),
+                                MyHomePage(),
+                            ],
+                        ),
+                    );
+                }
+            }
+    3.新建文件 做保持状态的页面组件 继承动态组件 使用到了状态，因此需要 with 一个类AutomaticKeepAliveClientMixin
+        然后重写wantKeepAlive方法 让他为true  @override bool get wantKeepAlive=>true;
+        声明变量 保存初始值
+        然后定义一个方法 setstate改变初始值  点一次按钮+1
+        在body处使用Center()组件  center的child处使用column布局将值显示在页面上
+        使用column的mainAxisAlignment:居中对齐
+        children处放上面声明的初始值_counter
+        在body的同级 使用floatingActionButton做一个浮动按钮
+        浮动按钮的点击事件放在上面自定义++的方法
+        最后将上面示例中children处的组件替换为这个状态组件MyHomePage()
+            class _MyHomePageState extends State<MyHomePage> with AutomaticKeepAliveClientMixin {
+                int _counter=0;
+                @override
+                bool get wantKeepAlive=>true;
+                void _incrementCounter(){
+                    setState(() {
+                    _counter++; 
+                    });
+                }
+                @override
+                Widget build(BuildContext context) {
+                    return Scaffold(
+                        body: Center(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                    Text('点一下'),
+                                    Text('$_counter',style: Theme.of(context).textTheme.display1,)
+                                ],
+                            ),
+                        ),
+                        floatingActionButton: FloatingActionButton(
+                            onPressed: _incrementCounter,
+                            tooltip: 'increament',
+                            child: Icon(Icons.add),
+                        ),
+                    );
+                }
+            }
+六、推荐搜索条
+    1.创建主入口文件 然后在home属性中加入SearchBarDemo，
+        这是一个自定义的Widget，主要代码都在这个文件中。在main.dart中引入
+        import 'package:flutter/material.dart';
+        import 'search_bar_demo.dart';
+        void main() => runApp(MyApp());
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                title: '推荐搜索条',
+                theme: ThemeData.light(),
+                home: SearchBarDemo(),
+                );
+            }
+        }
+    2.工作中这些数据是后台传递给我们，或者写成配置文件的，这里我们就以List的方式代替了。
+        我们在创建一个asset.dart文件用来模拟数据
+        我们在这个文件中定义了两个List：
+            searchList : 这个相当于数据库中的数据，我们要在这里进行搜索。
+            defaultGuess ： 显示在搜索条下方的默认推荐数据，就是搜索时，自动为我们进行推荐。
+    3.在appbar上的右侧使用actions属性添加一个搜索按钮 点击后进入搜索框
+        actions属性是一个<widget>数组 定义appbar右侧的内容
+            class _SearchBarDemoState extends State<SearchBarDemo> {
+                @override
+                Widget build(BuildContext context) {
+                    return Scaffold(
+                        appBar: AppBar(
+                            title: Text('searchbar demo'),
+                            actions: <Widget>[
+                                IconButton(
+                                    icon: Icon(Icons.search),
+                                    onPressed: (){
+                                        //print('搜索按钮被点击了');
+                                        步骤5之后将代码替换为
+                                        showSearch(context: context,delegate: searchBarDelegate());
+                                    },
+                                )
+                            ],
+                        ),
+                    );
+                }
+            }
+    4.开始创建搜索条  接着往下新建一个类 继承SearchDelegate<String>这个类 搜索委托 必须重写里边的4个方法
+        1.
+            首先重写返回值是List<widget>的buildActions()方法 传入上下文BuildContext
+            buildActions()方法表示搜索栏右侧的按钮 通常是一个清除按钮 点击清除搜索栏内容
+            return一个List数组 数组中包含IconButton() 在按钮事件中做清除操作  onPressed: ()=>query="", 
+            query相当于vue中的双向绑定 可以实时的获取输入的值   让query为空表示清除
+        2.  
+            接着重写返回值是一个Widget组件的buildLeading()方法 传入上下文BuildContext
+            buildLeading()方法表示搜索栏左侧的按钮 通常表示返回上层 点击可关闭搜索条返回上层
+            返回值是单个Widget 直接return IconButton() 折尺体验一个动画按钮 
+                在 IconButton()的icon属性使用AnimatedIcon()组件
+                    AnimatedIcon()组件属性icon 要写它的动画图标AnimatedIcons.menu_arrow, 返回的箭头
+                    AnimatedIcon()组件属性progress: transitionAnimation,要写它的动画
+            接着在IconButton()的事件中关闭搜索栏的操作()=>close(context,null), 使用close方法
+        3.  
+            接着重写返回值是一个Widget组件的buildResults()方法 传入上下文BuildContext
+            buildResults()方法是搜到到内容后的展现，因为我们的数据都是模拟的，所以我这里就使用最简单的Container+Card组件进行演示了
+            直接return一个Container(),Container()中放一个Card组件 card()中放一个Center()，Center()中放一个Text
+            Text()的内容直接写query 直接将用户输入的返回过去
+        4.
+            接着重写返回值是一个Widget组件的buildSuggestions()方法 传入上下文BuildContext
+            buildSuggestions()方法表示搜索推荐
+            定义一个变量 使用三木运算赋值
+                如果query为空 表示用户没有输入 就显示之前定义的显示在搜索条下方的默认推荐数据 
+                如果不为空 就使用数组的.where函数筛选定义的数据列表
+                    final guessList=query.isEmpty ? defaultGuess : searchList.where((input)=>input.startsWith(query)).toList();
+            之后return 动态列表ListView.Builder
+                动态列表的长度itemCount： guessList.length 写声明变量的长度
+                动态列表的内容itemBuilder是一个匿名函数 直接返回ListTile组件列表每一项
+                    ListTile有一个属性title 使用富文本组件RichText()让推荐列表更灵活
+                        RichText()的属性text:使用行文本组件TextSpan()
+                            行文本组件的text属性让用户输入的文字与列表进行匹配 
+                            匹配到的文本字体黑色 加粗显示  guessList[index].substring(0,query.length),
+                            匹配不到的在TextSpan()的children属性再定义一个TextSpan()
+                                这个TextSpan()中的text属性截取剩余的没有匹配到的显示灰色
+        5.最后在之前定义的actions属性的按钮事件中
+            调用显示搜索框的方法 传入上下文 和delegate
+            delegate就是配置好的earchBarDelegate
+            showSearch(context: context,delegate: searchBarDelegate());
+        示例：
+            class searchBarDelegate extends SearchDelegate<String>{ 
+                @override
+                List<Widget> buildActions(BuildContext context){
+                    return [
+                        IconButton(
+                            icon:Icon(Icons.clear),
+                            onPressed: ()=>query="",
+                        )
+                    ];
+                }
+                @override
+                Widget buildLeading(BuildContext context){
+                    return IconButton(
+                        icon: AnimatedIcon(
+                            icon: AnimatedIcons.menu_arrow,
+                            progress: transitionAnimation,
+                        ),
+                        onPressed: ()=>close(context,null),
+                    );
+                }
+                @override
+                Widget buildResults(BuildContext context){
+                    return Container(
+                        width: 100.0,
+                        height: 100.0,
+                        child: Card(
+                            color: Colors.redAccent,
+                            child: Center(
+                                child: Text(query),
+                            ),
+                        )
+                    );
+                }
+                @override
+                Widget buildSuggestions(BuildContext context){
+                    final guessList=query.isEmpty ? defaultGuess : searchList.where((input)=>input.startsWith(query)).toList();
+                    return ListView.builder(
+                        itemCount: guessList.length,
+                        itemBuilder: (context,index)=>ListTile(
+                            title: RichText(
+                                text: TextSpan(
+                                    text: guessList[index].substring(0,query.length),
+                                    style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold
+                                    ),
+                                    children: [
+                                        TextSpan(
+                                            text: guessList[index].substring(query.length),
+                                            style: TextStyle(color: Colors.grey)
+                                        )
+                                    ]
+                                ),
+                            ),
+                        ),
+                    );
+                }
+            }
+七、Wrap流式布局 模拟添加照片效果
+    1.创建入口文件 然后在home属性中加入WrapDemo，
+        这是一个自定义的Widget，主要代码都在这个文件中。在main.dart中引入
+            import 'package:flutter/material.dart';
+            import 'wrap_demo.dart';
+            void main() => runApp(MyApp());
+            class MyApp extends StatelessWidget {
+                @override
+                Widget build(BuildContext context) {
+                    return MaterialApp(
+                    title: '流式布局',
+                    theme: ThemeData.light(),
+                    home: WrapDemo(),
+                    );
+                }
+            }
+    2.模拟添加照片效果 添加的每一个都是装在一个数组里 而且是动态改变的值
+        所以 新建的组件中 继承动态Widget 并且声明<Widget>类型List的变量list 
+        然后init初始化数组 将要添加组件封装为一个buildAddButton() 方法返回要添加的widget
+        通过建造者语法..add添加 
+            list=List<Widget>()..add(buildAddButton());
+    3.然后咱们开始构建buildAddButton()这个方法
+        return  GestureDetector()手势识别组件
+        GestureDetector()组件是让那些没有点击事件的组件也能触发点击
+            在GestureDetector()的onTap()中通过setstate改变list
+            list通过insert方式在当前按钮的前一个位置 添加块及区域
+            将块级区域也封装为一个方法 buildPhoto()
+                setState(() {
+                    list.insert(list.length-1, buildPhoto());
+                });
+            在GestureDetector()的child属性定义点击添加块级的按钮
+                使用Padding容器 Padding()的padding设为8.0
+                 Padding()的child 使用一个Container() 宽高都是80.0 颜色灰色 child处放图标add
+        之后定义上面的块级区域方法buildPhoto()
+            buildPhoto()返回一个组件
+            组件也是使用Padding容器 Padding()的padding设为8.0
+             Padding()的child 使用一个Container() 宽高都是80.0 颜色黄色 child处放Center() center的child放Text('照片')
+    4.这样 点击按钮 和点击往list添加的块级区域就配置完了
+        最后要配置组件显示了 return Scaffold 
+        body放一个center容器
+        center的child放Opacity容器  设置opcacity：0.8 美观
+        Opacity的child放Container容器 
+        定义变量width和height 使用媒体查询组件获取手机屏幕的宽高
+            final width=MediaQuery.of(context).size.width;
+            final height=MediaQuery.of(context).size.height;
+        Container容器的宽百分百显示 高二分之一
+        背景颜色灰色 child放Wrap()组件 流式布局
+        Wrap的间距spacing设为26.0,
+        children处放一个之前声明的list
+    示例：
+        class _WrapDemoState extends State<WrapDemo> {
+            每添加一个块就是往数组是添加一个组件 声明一个list，接收组件
+            List<Widget> list;            
+            @override
+            初始化list 做添加组件的操作 将组件封装为一个返回值是Widget的方法
+            void initState() {   
+                super.initState();
+                list=List<Widget>()..add(buildAddButton()); 
+            }
+            @override
+            Widget build(BuildContext context) {
+                //通过媒体查询组件获取屏幕的宽高
+                final width=MediaQuery.of(context).size.width;
+                final height=MediaQuery.of(context).size.height;
+                return Scaffold(
+                    appBar: AppBar(
+                        title: Text('流式布局'),
+                    ),
+                    body: Center(
+                        child: Opacity(
+                            opacity: 0.8,
+                            child: Container(
+                                容器宽度使用上面获取的屏幕宽度
+                                width: width,
+                                height: height/2,
+                                color: Colors.grey,
+                                使用流式布局
+                                child: Wrap(
+                                    放上list
+                                    children: list,
+                                    spacing: 26.0,
+                                ),
+                            ),
+                        ),
+                    ),
+                );
+            }
+            Widget buildAddButton(){
+                //返回手势识别组价
+                return GestureDetector(
+                    onTap:(){
+                        if(list.length<9){
+                            改变list的状态动态插值 值是一个widget
+                            setState(() {
+                                list.insert(list.length-1, buildPhoto());
+                            });
+                        }
+                    },
+                    相当于一个按钮 点击添加块级的按钮
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                        width: 80.0,
+                        height: 80.0,
+                        color: Colors.black54,
+                        child: Icon(Icons.add),
+                        ),
+                    ),
+                );
+            }
+            Widget buildPhoto(){
+                这个就是点击按钮生成的每一个块级
+                return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                        width: 80.0,
+                        height: 80.0,
+                        color: Colors.amberAccent,
+                        child: Center(
+                            child: Text('照片'),
+                        ),
+                    ),
+                );
+            }
+        }
+八、展开闭合菜单案例
+    1.创建入口文件 然后在home属性中加入ExpansionTileDemo
+        这是一个自定义的Widget，主要代码都在这个文件中。在main.dart中引入
+        import 'package:flutter/material.dart';
+        import 'expansion.dart';
+        void main() => runApp(MyApp());
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                    title: '展开闭合菜单',
+                    theme: ThemeData(
+                        primarySwatch: Colors.blue
+                    ),
+                    home: ExpansionTileDemo(),
+                );
+            }
+        }
+    2.快速构建静态组件结构 return Scaffold脚手架
+        body处用Center组件让菜单居中显示
+        child处放今天的主角ExpansionTile()组件
+        ExpansionTile()的属性
+            title:闭合时显示的标题，这个部分经常使用Text Widget。
+            leading:标题左侧图标，多是用来修饰，让界面显得美观。
+            backgroundColor: 展开时的背景颜色，当然也是有过度动画的，效果非常好。
+            children: 子元素，是一个数组，可以放入多个元素。
+            trailing ： 右侧的箭头，你可以自行替换但是我觉的很少替换，因为谷歌已经表现的很完美了。
+            initiallyExpanded: 初始状态是否展开，为true时，是展开，默认为false，是不展开。
+        这个例子中ExpansionTile()的children用ListTile表示
+        示例：
+            return Scaffold(
+                appBar: AppBar(
+                    title: Text('展开闭合'),
+                ),
+                body: Center(
+                    child: ExpansionTile(
+                        //用户不点击的时候显示的文本
+                        title: Text('春雪'),
+                        //左边的图标 也可以是文本或图片
+                        leading: Icon(Icons.ac_unit),
+                        //右侧的箭头，你可以自行替换但是我觉的很少替换，因为谷歌已经表现的很完美了。
+                        trailing: Text('唐·韩愈',style:TextStyle(fontSize:14.0)),
+                        //打开显示的背景颜色
+                        backgroundColor: Colors.white12,
+                        //初始状态是否展开，为true时，是展开，默认为false，是不展开。
+                        initiallyExpanded: false,
+                        //打开后显示的内容 可以是多个
+                        children: <Widget>[
+                            ListTile(
+                                title: Text('新年都未有芳华，二月初惊见草芽。 '),
+                                leading: Icon(Icons.ac_unit),
+                            ),
+                            ListTile(
+                                title: Text('白雪却嫌春色晚，故穿庭树作飞花。'),
+                                leading: Icon(Icons.ac_unit),
+                            )
+                        ],
+                    ),
+                ),
+            );
+九、展开闭合列表菜单
+    1.创建入口文件 然后在home属性中加入ExpansionListDemo
+        这是一个自定义的Widget，主要代码都在这个文件中。在main.dart中引入
+        import 'package:flutter/material.dart';
+        import 'expansion_list.dart';
+        void main() => runApp(MyApp());
+        class MyApp extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return MaterialApp(
+                    title: '展开闭合菜单',
+                    theme: ThemeData(
+                        primarySwatch: Colors.blue
+                    ),
+                    home: ExpansionListDemo(),
+                );
+            }
+        }
+    2.列表菜单的开关闭合需要动态修改值 所以继承动态widget
+        为了方便管理制作一个ExpandState类，里边就是两个状态，一个是是否展开isOpen,另一个索引值index。代码如下:
+            class ExpandState{
+                var isOpen;
+                var index;
+                ExpandState(this.index,this.isOpen);
+            }
+        然后在组件中定义int类型的数组 用来控制索引
+        然后定义一个ExpandState类型的list 开展开的状态列表
+        调用组件构造方法为列表赋值 循环插值 以后会通过遍历list的值循环生成列表内容
+        调用自定义类 将下标和bool值 每个列表菜单初始状态 赋值给状态列表expandStateList
+            _ExpansionListDemoState(){
+                mList=new List();
+                expandStateList=new List();
+                for(int i=0;i<10;i++){
+                    mList.add(i);
+                    expandStateList.add(ExpandState(i,false));
+                }
+            }
+    3.在组件body处写我们的主题内容 需要注意的是这个列表必须放在可滑动组件中使用，否则会报错。
+        所以body处放SingleChildScrollView()组件 一个最简单滚动组件
+        它的child放今天主角ExpansionPanelList()
+        ExpansionPanelList()有一个属性 expansionCallback 是来控制菜单开关闭合的 是一个带参的callback 一个是列表菜单的索引index，一个是展开状态bol布尔值
+            在上面单独封装私有方法 将它这两个参数传进去_setCurrentIndex(index,bol)
+                forEach遍历expandStateList 查找当前列表菜单的index 将他的状态值取反 如果是开的就关闭 如果是关闭的就展开 
+                    _setCurrentIndex(int index,isExpand){
+                        setState(() {
+                            expandStateList.forEach((item){
+                                if(item.index==index){
+                                    item.isOpen=!isExpand;
+                                }
+                            }); 
+                        });
+                    }
+        在ExpansionPanelList()的children属性使用dart语法.map遍历之前声明的索引数组list .map()接收一个匿名函数 返回列表菜单每一项ExpansionPanel()组件
+            ExpansionPanel()有一个属性headerBuilder是一个带参的匿名函数 参数上下文context 状态值isExpanded
+                匿名函数的作用是返回菜单未打开时的标题 直接return一个ListTile()
+                    ListTile的title 就读取map循环时的index 动态生成列表标题 title:Text('这是第${index}个'),
+                headerBuilder属性的同级还有一个body属性 菜单展开后显示的内容
+                    也直接放一个ListTile同标题一样
+                还有一个同级属性isExpanded: 取值就是我们的状态数组expandStateList[index].isOpen 
+                    意思获取当前选择项的展开关闭状态 为上面的控制开关闭合的callback准备的
+        最后在.map()之后 .toList()将返回的组件整合成数组 mList.map((index){...}).toList()
+    示例：
+        class _ExpansionListDemoState extends State<ExpansionListDemo> {
+            List<int> mList; //组成一个int类型数组，用来控制索引
+            List<ExpandState> expandStateList; /开展开的状态列表， ExpandStateBean是自定义的类
+            _ExpansionListDemoState(){  //构造方法，调用这个类的时候自动执行
+                mList=new List();
+                expandStateList=new List();
+                for(int i=0;i<10;i++){ //便利为两个List进行赋值
+                    mList.add(i);
+                    expandStateList.add(ExpandState(i,false));
+                }
+            }
+            自定义控制状态的私有方法
+            _setCurrentIndex(int index,isExpand){
+                setState(() {
+                    expandStateList.forEach((item){ //遍历可展开状态列表
+                        if(item.index==index){
+                            item.isOpen=!isExpand;    //取反，经典取反方法
+                        }
+                    }); 
+                });
+            }
+            @override
+            Widget build(BuildContext context) {
+                return Scaffold(
+                    appBar: AppBar(
+                        title: Text('展开闭合菜单列表'),
+                    ),
+                    菜单列表必须放在可滚动列表中
+                    body: SingleChildScrollView(
+                        child: ExpansionPanelList(
+                            expansionCallback: (index,bol){  //交互回掉属性，里边是个匿名函数
+                                _setCurrentIndex(index, bol);  //调用内部方法
+                            }, 
+                            children: mList.map((index){ /进行map操作，然后用toList再次组成List
+                                return ExpansionPanel(
+                                    headerBuilder: (context,isExpanded){
+                                        return ListTile(
+                                            title: Text('这是第${index}个'),
+                                        );
+                                    },
+                                    body: ListTile(
+                                        title: Text('这是第${index}个'),
+                                    ),
+                                    isExpanded: expandStateList[index].isOpen
+                                );
+                            }).toList(),
+                        ),
+                    ),
+                );
+            }
+        }
+        class ExpandState{ //自定义状态类
+            var isOpen;
+            var index;
+            ExpandState(this.index,this.isOpen);
+        }
+十、路径裁切和贝塞尔曲线(有Bug)
+    1.建入口文件 然后在home属性中加入HomePage 步骤1同上面
+        MaterialApp()中有一个debugShowCheckedModeBanner: false,是去掉debug的图标
+    2.采用Column布局 children属性放ClipPath()组件
+        ClipPath属性：
+            clipper: 切割的路径 封装为一个类BottomClipper 继承CustomClipper类 这个要和CustomClipper对象配合使用。
+            child :要切割的元素，可以是容器，图片.....
+        先配置要切割的元素 使用Container()容器 定义背景颜色 高度200.0
+    3.开始定义BottomClipper类 也就是切割的路径 继承CustomClipper<Path> 继承后要重写两个方法
+        首先重写返回值是一个Path的getClip(Size szie){}方法
+            它的参数size是一个包含要切割元素宽高的对象 
+            先声明变量 实例化Path() var path=new Path()
+            使用path.lineTo移动坐标 先是起点(0,0) 然后移动到下一个位置 path.lineTo(0,size.height-50)左下角
+            绘制贝塞尔曲线需要有控制点和终点 声明变量保存这些坐标
+            先是控制点起点var startPath=Offset(size.width/2,size.height); 下方中间位置
+            再是终点var endPath=Offset(size.width,size.height-50);右下角
+            然后使用path.quadraticBezierTo()这个方法将坐标连接起来 变量的dx dy就是坐标
+            在移动到path.lineTo(size.width, size.height-50);右下角曲线上方的位置
+            在移动到path.lineTo(size.width, 0.0);右上角
+            最后path.close();关闭绘制 
+            然后把Path return出去 
+        其次重写返回值是bool的bool shouldReclip(CustomClipper<Path> oldClipper){return false} 返回false 
+            没什么用这样写就行
+        示例：
+            class HomePage extends StatelessWidget {
+                @override
+                Widget build(BuildContext context) {
+                    return Scaffold(
+                        body:Column(
+                            children: <Widget>[
+                                ClipPath(
+                                    clipper:BottomClipper(),
+                                    child: Container(
+                                    color:Colors.lightBlue,
+                                    height: 200.0,
+                                    ),
+                                )
+                            ],
+                        )
+                    );
+                }
+            }
+            class BottomClipper extends CustomClipper<Path>{
+                @override
+                Path getClip(Size size) {
+                    var path = Path();
+                    path.lineTo(0.0, 0.0);
+                    path.lineTo(0.0, size.height-50);
+                    var startPath=Offset(size.width/2,size.height);
+                    var endPath=Offset(size.width,size.height-50);
+                    path.quadraticBezierTo(startPath.dx, startPath.dy, endPath.dx, endPath.dy);
+                    path.lineTo(size.width, size.height-50);
+                    path.lineTo(size.width, 0.0);
+                    path.close();
+                    return path;
+                }
+                @override
+                bool shouldReclip(CustomClipper<Path> oldClipper) {
+                    // TODO: implement shouldReclip
+                    return false;
+                }
+            }
+十、路径裁切和二段贝塞尔曲线
+        同上 
+        只不过是绘制多个控制点 终点
+        使用多次path.quadraticBezierTo()方法生成多条曲线
+十一、App启动图(闪屏动画)
+    1.建入口文件 然后在home属性中加入StartUpImage 步骤1同上面
+    2.在文件中创建StartUpImage组件 继承动态Widget  使用到了动画效果，因此需要 with 一个类
+        SingleTickerProviderStateMixin 主要是我们初始化AnimationController时，
+        先声明AnimationController _controller;
+            AnimationController是Animation的一个子类，它可以控制Animation, 也就是说它是来控制动画的，比如说控制动画的执行时间。
+            既然有了动画控制器 就需要在声明一个动画Animation _animation;
+        之后我们在init初始化控制器和动画
+            控制器AnimationController有两个参数
+                vsync:this :垂直同步设置，动画效果的异步处理，使用this就可以了。
+                duration : 动画持续时间，这个可以使用seconds秒，也可以使用milliseconds毫秒，工作中经常使用毫秒，因为秒还是太粗糙了。
+            动画_Animation=Tween() 
+                Tween有开始begin和结束end 然后.animate(_controller)添加动画效果将控制器传过去
+        这时候动画就初始化完毕了 还需要一个 就是动画播放完显示(跳转)首页 需要一个监听事件
+            接着在init添加监听事件_animation.addStatusListener()
+            里面是一个回调  回调有一个参数status动画状态
+            然后做一个判断 当动画播放完时，也就是状态status==AnimationStatus.completed
+                AnimationStatus.completed是动画播放完的一个状态
+                使用navigator.of(context)传入上下文 然后接着使用.pushAndRemoveUntil()跳转
+                    Navigator.of(context).pushAndRemoveUntil(route，callback)表示跳转后关闭播放的动画 节省内存
+                有两个参数  第一个参数使用常用的MaterialPageRoute()路由组件
+                    传入上下文指向首页homepage()现在还没有 一会配置 进行跳转 见步骤4
+                第二个参数是固定写法 回调函数 参数route返回route==null
+                    (route)=>route==null
+        至此动画配置完毕 然后调用控制器 _controller的forward()播放动画
+             _controller.forward();
+        播放动画后 重写dispose()销毁动画控制器 整个页面 dispose 时，记得把控制器controller也 dispose 掉，释放内存
+            @override
+            void dispose(){
+                _controller.dispose();
+                super.dispose(); 
+            }
+    3.接下来在widget中直接返回渐隐渐现的动画组件 FadeTransition()
+        FadeTransition()的opacity属性将咱们配置完成的_annimation放上去
+        FadeTransition()的child属性放启动图Image()组件 使用scale进行缩放 fit属性BoxFit.cover进行充满容器
+    4.接下来配置启动图加载完后跳转的首页HomePage()
+        示例的首页相对简单一些 return Scaffold脚手架 配置appbar
+        配置body center组件包裹一个Text组件 
+        最后在动画组件文件中引入
+    示例:
+        import 'package:flutter/material.dart';
+        import 'homepage.dart';
+        class StartUpImage extends StatefulWidget {
+            _StartUpImageState createState() => _StartUpImageState();
+        }
+        class _StartUpImageState extends State<StartUpImage> with SingleTickerProviderStateMixin {
+            //相当于控制动画的控制器
+            AnimationController _controller;
+            Animation _animation;
+            @override
+            void initState() {
+                super.initState();
+                _controller=AnimationController(vsync: this,duration: Duration(milliseconds: 3000));
+                _animation=Tween(begin: 0.0,end: 1.0).animate(_controller);
+                _animation.addStatusListener((status){
+                    if(status==AnimationStatus.completed){
+                        Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context)=>MyHomePage()),
+                        (route)=>route==null
+                        );
+                    }
+                });
+                _controller.forward();//播放动画
+            }
+            @override
+            void dispose() {
+                _controller.dispose();
+                super.dispose(); 
+            }
+            @override
+            Widget build(BuildContext context) {
+                return FadeTransition(
+                    opacity: _animation,
+                    child: Image.network(
+                        'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1546851657199&di=fdd278c2029f7826790191d59279dbbe&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0112cb554438090000019ae93094f1.jpg%401280w_1l_2o_100sh.jpg',
+                        scale: 2.0,
+                        fit: BoxFit.cover,
+                    ),
+                );
+            }
+        }    
+十二、右滑返回上一页
+    1.建入口文件 然后在home属性中加入RightBackDemo() 步骤1同上面
+    2.在新文件中配置右滑返回上一页 不同的是不在使用material UI 
+        而是使用flutter的另一套模板UI Cupertino 用的右滑返回上一级就是在这个Cupertino里。
+        直接和material一样用import引入，引入之后就可以使用了
+        Cupertino里没有scaffold脚手架 但是有一个CupertinoPageScaffold() 效果和scaffold一样
+        CupertinoPageScaffold()它的属性是child 
+        在child放一个Center组件 center的child处使用Container
+        配置Container的宽高和背景颜色 背景颜色的取值不再是Colors 而是CupertinoColors.activeBlue,
+        Container的child放一个按钮CupertinoButton()实现点击块级跳转
+            CupertinoButton()的child是Icon()图标 不同的是参数是CupertinoIcons.add
+            按钮的点击事件Onpressed还是使用Navigator.of(context).push()跳转
+                不同的是push里的路由组件改为CupertinoPageRoute()
+                CupertinoPageRoute()路由的builder同样是一个匿名函数
+                    传入上下文 咱们这直接返回本身 也就是RightBackDemo() 
+                    这样会一直跳转到自身 相当于一个死循环 
+                    然后就可以右滑返回上一页了
+    示例：
+        import 'package:flutter/cupertino.dart';
+        class RightBackDemo extends StatelessWidget {
+            @override
+            Widget build(BuildContext context) {
+                return CupertinoPageScaffold(
+                    child: Center(
+                        child: Container(
+                            height: 100.0,
+                            width: 100.0,
+                            color: CupertinoColors.activeBlue,
+                            child: CupertinoButton(
+                                child: Icon(CupertinoIcons.add),
+                                onPressed: (){
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(builder: (BuildContext context)=> RightBackDemo())
+                                    );
+                                },
+                            ),
+                        ),
+                    ),
+                );
+            }
+        }
+十三、轻量级提示操作ToolTip
+    1.建入口文件 然后在home属性中加入ToolTipDemo() 步骤1同上面
+    2.其实Flutter中有很多提示控件,比如Dialog、Snackbar和BottomSheet这些操作都是比较重量级的，存在屏幕上的时间较长或者会直接打断用户的操作。
+        Tooltip是继承于StatefulWidget的一个Widget，它并不需要调出方法，当用户长按被Tooltip包裹的Widget时，会自动弹出相应的操作提示。
+        在新文件中创建组件ToolTipDemo() return Scaffold脚手架 
+        body处使用Center组件 center的child使用ToolTip组件
+        被ToolTip包裹的组件 长按会提示信息
+        在tooltip的child属性放一个图片 长按图片提示信息
+        tooltip的message属性是长按提示的信息 写上文本就可以
+    示例:
+        return Scaffold(
+            appBar: AppBar(
+                title: Text('青玉案·元夕'),
+            ),
+            body: Center(
+                child: Tooltip(
+                    child: Image.network('https://hellorfimg.zcool.cn/provider_image/preview260/2235462939.jpg'),
+                    message: '东风夜放花千树。更吹落、星如雨。宝马雕车香满路。凤箫声动，玉壶光转，一夜鱼龙舞。 蛾儿雪柳黄金缕。笑语盈盈暗香去。众里寻他千百度。蓦然回首，那人却在，灯火阑珊处。',
+                ),
+            ),
+        );
+十四、Draggable拖拽控件
+        1.建入口文件 然后在home属性中加入DraggableDemo() 步骤1同上面
+        2.在创建DraggableDemo()组件之前 先新建文件 封装要复用的块级组件
+            创建DraggableWidget()复用组件 继承动态Widget 
+                颜色值和摆放的位置需要调用时传递 所以声明两个变量接收参数 super调用父类
+                    final Offset offset;
+                    final Color widgetColor;
+                    const DraggableWidget({Key key,this.offset,this.widgetColor}):super(key:key);
+                之后初始化Offset位置 再在init中取出传递过来的offset的值 赋值给offset
+                    Offset offset=Offset(0.0, 0.0);
+                    @override
+                    void initState() {
+                        super.initState();
+                        offset=widget.offset;
+            之后配置我们的组件 使用Positioned定位布局 通过传递的位置进行定位
+                Positioned()的left就是传递的offset.dx，top就是offset.dy
+                Positioned()的child使用今天的主角Draggable()
+                    Draggable控件负责就是拖拽，父层使用了Draggable，它的子元素就是可以拖动的，子元素可以实容器，可以是图片。用起来非常的灵活。
+                    Draggable属性:
+                        data： 是要传递的参数，在DragTarget里，会接受到这个参数。当然要在拖拽控件推拽到DragTarget的时候。
+                        child:在这里放置你要推拽的元素，可以是容器，也可以是图片和文字。
+                        feedback: 常用于设置推拽元素时的样子，在案例中当推拽的时候，我们把它的颜色透明度变成了50%。当然你还可以改变它的大小。
+                        onDraggableCanceled:是当松开时的相应事件，经常用来改变推拽时到达的位置，改变时用setState来进行。
+                Draggable()的data设置为widgetColor接收过来的颜色 再将颜色传递给接收容器
+                Draggable()的child在这里使用Container 宽高100.0 颜色使用接收的颜色widgetColor
+                Draggable()的feedback在这也是使用Container 宽高110 颜色接收的颜色但设置opaticy为50% 也就是拖拽时元素的样子
+                Draggable()的onDraggableCanceled拖拽结束的响应时事件 有两个参数 
+                    一个是频率(速度)velocity 一个是当前元素被拖拽的位置offset 
+                    在setState修改 元素的offset为拖拽后的offset  this.offset=offset; 
+            复用组件配置示例：
+                class DraggableWidget extends StatefulWidget {
+                    final Offset offset;
+                    final Color widgetColor;
+                    const DraggableWidget({Key key,this.offset,this.widgetColor}):super(key:key);
+                    _DraggableWidgetState createState() => _DraggableWidgetState();
+                }
+                class _DraggableWidgetState extends State<DraggableWidget> {
+                    Offset offset=Offset(0.0, 0.0);
+                    @override
+                    void initState() {
+                        super.initState();
+                        offset=widget.offset;
+                    }
+                    @override
+                    Widget build(BuildContext context) {
+                        return Positioned(
+                            left: offset.dx,
+                            top: offset.dy,
+                            child: Draggable(
+                                data: widget.widgetColor,
+                                child: Container(
+                                    width: 100.0,
+                                    height: 100.0,
+                                    color: widget.widgetColor,
+                                ),
+                                feedback:Container(
+                                    width: 110.0,
+                                    height: 110.0,
+                                    color: widget.widgetColor.withOpacity(0.5),
+                                ) ,
+                                onDraggableCanceled: (Velocity velocity,Offset a){
+                                    setState(() {
+                                    this.offset=offset; 
+                                    });
+                                },
+                            ),
+                        );
+                    }
+                }
+        3.复用的可拖拽的组件配置完后 开始在DraggableDemo()调用
+            先进行配置 继承动态Widget
+                返回scaffold脚手架 配置appbar后使用Stack层叠布局
+                stack的children需要多个组件 调用两次自定义配置的拖拽组件 传递过去颜色和位置
+                在自定义组件同级 使用Center容器 在Center容器的child使用接受容器接受拖拽后传递的参数
+                在上面声明变量Color _draggableColor=Colors.grey设置接收器的默认颜色
+                    接收容器DragTarget()是用来接收拖拽事件的控件，当把Draggable放到DragTarget里时，他会接收Draggable传递过来的值，然后用生成器改变组件状态。
+                    DragTarget()的属性；
+                        onAccept:当推拽到控件里时触发，经常在这里得到传递过来的值。
+                        builder: 构造器，里边进行修改child值。
+                DragTarget()的onAccept是一个匿名函数  参数就是拖拽控件传递的参数 
+                    可以取到值 也就是一个颜色值  取到值之后将值赋值给保存构造器颜色的变量_draggableColor=color;
+                然后配置DragTarget()的构造器
+                    builder 是个匿名函数 有三个参数 上下文context candidateData,rejecteData 还有两个不用管
+                    在函数中返回return接收容器Container
+                    设置接收容器的宽高200.0 颜色处就是上边声明的变量 已经通过onAccept动态赋值了
+            使用复用组件示例：
+                import 'package:flutter/material.dart';
+                import 'draggable_widget.dart';
+                class DraggableDemo extends StatefulWidget {
+                    _DraggableDemoState createState() => _DraggableDemoState();
+                }
+                class _DraggableDemoState extends State<DraggableDemo> {
+                    Color _draggableColor=Colors.grey;
+                    @override
+                    Widget build(BuildContext context) {
+                        return Scaffold(
+                            appBar: AppBar(title: Text('拖拽控件'),),
+                            body: Stack(
+                                children: <Widget>[
+                                    DraggableWidget(
+                                        offset: Offset(80.0, 60.0),
+                                        widgetColor: Colors.tealAccent,
+                                    ),
+                                    DraggableWidget(
+                                        offset: Offset(180.0, 60.0),
+                                        widgetColor: Colors.redAccent,
+                                    ),
+                                    Center(
+                                        child: DragTarget(
+                                            onAccept: (Color color){
+                                                _draggableColor=color;
+                                            },
+                                            builder: (context,candidateData,rejecteData){
+                                                return Container(
+                                                width: 200.0,
+                                                height: 200.0,
+                                                color: _draggableColor,
+                                                );
+                                            },
+                                        ),
+                                    )
+                                ],
+                            ),
+                        );
+                    }
+                }
+
+
+
+
+
+
+
+
+            
+
